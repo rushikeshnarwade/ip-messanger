@@ -7,6 +7,9 @@ class InteractionModel {
   final String? peerUsername;
   final String lastMessage;
   final Timestamp lastMessageTimestamp;
+  final bool isOnline;
+  final Map<String, dynamic>? connectionInfo;
+  final int unreadCount;
 
   InteractionModel({
     required this.peerDeviceID,
@@ -14,6 +17,9 @@ class InteractionModel {
     required this.peerUsername,
     required this.lastMessage,
     required this.lastMessageTimestamp,
+    this.isOnline = false,
+    this.connectionInfo,
+    this.unreadCount = 0,
   });
 
   InteractionModel.fromFirestore(Map<String, dynamic> data)
@@ -21,7 +27,10 @@ class InteractionModel {
       peerIP = data['peerIP'],
       peerUsername = data['peerUsername'],
       lastMessage = data['lastMessage'],
-      lastMessageTimestamp = data['lastMessageTimestamp'];
+      lastMessageTimestamp = data['lastMessageTimestamp'],
+      isOnline = data['isOnline'] ?? false,
+      connectionInfo = data['connectionInfo'],
+      unreadCount = data['unreadCount'] ?? 0;
 
   Map<String, dynamic> toJson() {
     return {
@@ -30,6 +39,9 @@ class InteractionModel {
       'peerUsername': peerUsername,
       'lastMessage': lastMessage,
       'lastMessageTimestamp': lastMessageTimestamp,
+      'isOnline': isOnline,
+      'connectionInfo': connectionInfo,
+      'unreadCount': unreadCount,
     };
   }
 }

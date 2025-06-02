@@ -55,7 +55,7 @@ class UserService {
     if (response.statusCode == 200) {
       return response.body;
     } else {
-      print('API Call failed while getting IP address: ' + response.toString());
+      print('API Call failed while getting IP address: $response');
       throw Exception('Failed to get IP address');
     }
   }

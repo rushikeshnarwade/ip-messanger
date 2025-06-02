@@ -19,6 +19,14 @@ class AuthService {
       );
 
       if (userCreds.user != null) {
+        // Set online status immediately after login
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCreds.user!.uid)
+            .update({
+              'isOnline': true,
+              'lastSeen': FieldValue.serverTimestamp(),
+            });
         await UserService.getCurrentUser();
       }
     } on FirebaseAuthException catch (error) {
@@ -31,6 +39,14 @@ class AuthService {
   }
 
   static Future<void> logout() async {
+    final uid = getUID();
+    if (uid != null) {
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'isOnline': false,
+        'lastSeen': FieldValue.serverTimestamp(),
+        'connectionInfo': null,
+      });
+    }
     await auth.signOut();
   }
 
@@ -56,12 +72,14 @@ class AuthService {
         DateTime.now(),
         getUID()!,
         email,
+        true, // isOnline - set to true since user just signed up
+        null, // photoUrl - initially null
       );
 
       final firestore = FirebaseFirestore.instance;
 
       final usernameRef = firestore.collection('usernames').doc(user.username);
-      final userRef = firestore.collection('users').doc(user.uid);
+      final userRef = firestore.collection('users').doc(user.id);
 
       await firestore.runTransaction((transaction) async {
         final usernameSnapshot = await transaction.get(usernameRef);
@@ -71,7 +89,7 @@ class AuthService {
         }
 
         transaction.set(usernameRef, {
-          'userId': user.uid,
+          'userId': user.id,
           'createdAt': FieldValue.serverTimestamp(),
         });
 
