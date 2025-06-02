@@ -50,17 +50,6 @@ class WebRTCService {
         _safeAddToConnectionState(_isConnected);
       };
 
-      // Get local media stream
-      localStream = await navigator.mediaDevices.getUserMedia({
-        'audio': true,
-        'video': {'facingMode': 'user'},
-      });
-
-      // Add local tracks to peer connection
-      localStream!.getTracks().forEach((track) {
-        peerConnection!.addTrack(track, localStream!);
-      });
-
       // Listen for remote tracks
       peerConnection!.onTrack = (RTCTrackEvent event) {
         if (event.streams.isNotEmpty) {
